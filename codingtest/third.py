@@ -20,10 +20,22 @@ def find_missing_integer(A, B):
     C = []
     used_numbers = set()
 
+    # C2: A[i] == B[i] 인 경우 저장
+    priority_values = set()
+    for i in range(N):
+        if A[i] == B[i]:
+            priority_values.add(A[i])
+
     for i in range(N):
         a, b = A[i], B[i]
 
-        if a in used_numbers and (b in used_numbers or a > b):
+        # 먼저 C2(priority_values)에 있는 값이면 그걸 선택
+        if a in priority_values and a not in used_numbers:
+            chosen = a
+        elif b in priority_values and b not in used_numbers:
+            chosen = b
+        # C2에 없는 경우 기존 방식대로 선택
+        elif a in used_numbers and (b in used_numbers or a > b):
             chosen = a
         elif b in used_numbers:
             chosen = b
@@ -31,20 +43,20 @@ def find_missing_integer(A, B):
             chosen = max(a, b)
 
         C.append(chosen)
-        # print(C)
         used_numbers.add(chosen)
 
+    # C에 없는 가장 작은 양의 정수 찾기
     missing = 1
     while missing in used_numbers:
         missing += 1
 
     return missing
 
-print(find_missing_integer([6, 2, 3, 4, 5, 7, 1], [4, 2, 3, 4, 5, 6, 1]))
-print(find_missing_integer([1, 2, 4, 3], [1, 3, 2, 3]))
-print(find_missing_integer([3, 2, 1, 6, 5], [4, 2, 1, 3, 3]))
-print(find_missing_integer([1, 2], [1, 2]))
-print(find_missing_integer([5, 6, 7], [8, 9, 10]))
-print(find_missing_integer([1, 2, 3], [4, 5, 6]))
 
-
+print(find_missing_integer([1, 3, 4, 5, 7, 6, 2], [1, 2, 4, 5, 6, 3, 2]))  # ✅ 예상: 3
+print(find_missing_integer([1, 2, 4, 3], [1, 3, 2, 3]))                    # ✅ 예상: 2
+print(find_missing_integer([3, 2, 1, 6, 5], [4, 2, 1, 3, 3]))              # ✅ 예상: 3
+print(find_missing_integer([1, 2], [1, 2]))                                # ✅ 예상: 3
+print(find_missing_integer([5, 6, 7], [8, 9, 10]))                         # ✅ 예상: 1
+print(find_missing_integer([1, 2, 3], [4, 5, 6]))                          # ✅ 예상: 1
+print(find_missing_integer([1, 3, 4, 5, 7, 6, 2], [1, 2, 4, 5, 6, 3, 2]))  # ✅ 예상: 3
