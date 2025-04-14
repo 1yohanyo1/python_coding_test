@@ -6,42 +6,48 @@
 # ex) a = 1, b = 4, c = 0
 # => b a b b
 
-from functools import lru_cache
+from collections import deque
 
-def generate_min_string_dp(a, b, c):
-    total_len = a + b + c
+def generate_min_string_iterative_dp(a_max, b_max, c_max):
+    dp = {}
+    queue = deque()
 
-    @lru_cache(maxsize=None)
-    def dfs(a_left, b_left, c_left, last1, last2):
-        if a_left == 0 and b_left == 0 and c_left == 0:
-            return ""
+    dp[(0, 0, 0, '', '')] = ''
+    queue.append((0, 0, 0, '', ''))
 
-        for ch, cnt in [('a', a_left), ('b', b_left), ('c', c_left)]:
-            if cnt == 0:
+    while queue:
+        a, b, c, last1, last2 = queue.popleft()
+        current = dp[(a, b, c, last1, last2)]
+
+        for ch in ['a', 'b', 'c']:
+            if ch == 'a' and a < a_max:
+                na, nb, nc = a + 1, b, c
+            elif ch == 'b' and b < b_max:
+                na, nb, nc = a, b + 1, c
+            elif ch == 'c' and c < c_max:
+                na, nb, nc = a, b, c + 1
+            else:
                 continue
+
             if last1 == last2 == ch:
                 continue
 
-            if ch == 'a':
-                suffix = dfs(a_left - 1, b_left, c_left, last2, 'a')
-            elif ch == 'b':
-                suffix = dfs(a_left, b_left - 1, c_left, last2, 'b')
-            else:
-                suffix = dfs(a_left, b_left, c_left - 1, last2, 'c')
+            new_key = (na, nb, nc, last2, ch)
+            new_str = current + ch
 
-            if suffix is not None:
-                return ch + suffix
+            if new_key not in dp or new_str < dp[new_key]:
+                dp[new_key] = new_str
+                queue.append(new_key)
 
-        return None
-
-    result = dfs(a, b, c, '', '')
-    return result if result is not None else "no answer"
+    results = [v for (a, b, c, _, _), v in dp.items() if a == a_max and b == b_max and c == c_max]
+    return min(results) if results else ""
 
 
 
 
-print(generate_min_string_dp(1, 1, 7))
-print(generate_min_string_dp(3, 8, 8))
-print(generate_min_string_dp(80, 3, 80))
-print(generate_min_string_dp(50, 100, 303))
-# print(generate_min_string_dp(500, 500, 500))
+
+print(generate_min_string_iterative_dp(1, 1, 7))
+print(generate_min_string_iterative_dp(3, 8, 8))
+print(generate_min_string_iterative_dp(80, 3, 80))
+print(generate_min_string_iterative_dp(50, 100, 303))
+# print(generate_min_string_iterative_dp(500, 500, 500))
