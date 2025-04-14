@@ -6,44 +6,42 @@
 # ex) a = 1, b = 4, c = 0
 # => b a b b
 
-def generate_min_string(a, b, c):
+from functools import lru_cache
+
+def generate_min_string_dp(a, b, c):
     total_len = a + b + c
-    best_result = None
-    found = False
 
-    def backtrack(path, a_left, b_left, c_left):
-        nonlocal best_result, found
+    @lru_cache(maxsize=None)
+    def dfs(a_left, b_left, c_left, last1, last2):
+        if a_left == 0 and b_left == 0 and c_left == 0:
+            return ""
 
-        if len(path) == total_len:
-            best_result = ''.join(path)
-            found = True
-            return
-
-        for ch, count_left in [('a', a_left), ('b', b_left), ('c', c_left)]:
-            if count_left == 0:
+        for ch, cnt in [('a', a_left), ('b', b_left), ('c', c_left)]:
+            if cnt == 0:
+                continue
+            if last1 == last2 == ch:
                 continue
 
-            if len(path) >= 2 and path[-1] == path[-2] == ch:
-                continue
-
-            path.append(ch)
             if ch == 'a':
-                backtrack(path, a_left - 1, b_left, c_left)
+                suffix = dfs(a_left - 1, b_left, c_left, last2, 'a')
             elif ch == 'b':
-                backtrack(path, a_left, b_left - 1, c_left)
+                suffix = dfs(a_left, b_left - 1, c_left, last2, 'b')
             else:
-                backtrack(path, a_left, b_left, c_left - 1)
+                suffix = dfs(a_left, b_left, c_left - 1, last2, 'c')
 
-            if found:
-                return
+            if suffix is not None:
+                return ch + suffix
 
-            path.pop()
+        return None
 
-    backtrack([], a, b, c)
-    return best_result if best_result else "no answer"
+    result = dfs(a, b, c, '', '')
+    return result if result is not None else "no answer"
 
 
 
-print(generate_min_string(1, 1, 7))
-print(generate_min_string(3, 8, 8))
-# print(generate_min_string(30, 80, 80))
+
+print(generate_min_string_dp(1, 1, 7))
+print(generate_min_string_dp(3, 8, 8))
+print(generate_min_string_dp(80, 3, 80))
+print(generate_min_string_dp(50, 100, 303))
+# print(generate_min_string_dp(500, 500, 500))
