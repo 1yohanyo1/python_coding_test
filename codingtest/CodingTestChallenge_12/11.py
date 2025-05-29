@@ -1,4 +1,4 @@
-# 미리 계산산
+# 최대값 생성
 MAX = 30
 bottom_up = [[0] * MAX for _ in range(MAX)]
 
@@ -13,8 +13,5 @@ for i in range(1, MAX):
 
 t = int(input())
 for _ in range(t):
-    # 서쪽
-    n = int(input())
-    # 동쪽
-    m = int(input())
+    n, m = map(int, input().split())
     print(bottom_up[m][n])
